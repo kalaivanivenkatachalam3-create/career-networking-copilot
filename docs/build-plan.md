@@ -46,24 +46,71 @@ Capabilities:
 No automatic company ranking in MVP.
 
 ## Phase 3 — People / Contacts
-Two paths:
-1. AI contact recommendations → User selects
-2. User research → User adds person
+This phase explicitly implements the continuous People → Contact workflow.
 
-Store contact information and source.
+### AI recommendation path
+Company → AI recommends person → User accepts → Contact record automatically created/pre-populated → User reviews/edits
+
+Known fields should be carried forward automatically:
+- Full name
+- Company
+- Position
+- Location
+- Profile URL
+- Contact type
+- Source
+- Email, if available
+
+### User research path
+Company → User adds person → Contact record created → User reviews/edits
+
+### Acceptance criteria
+- Accepting an AI recommendation creates a structured contact record.
+- Known information is pre-populated.
+- User can correct or complete missing information.
+- No duplicate re-entry is required.
+- Contact source/provenance is retained.
+- The contact record exposes **Draft Outreach**.
 
 ## Phase 4 — Outreach Generation
-Profile + Preferences + Company + Person + Relevant History → Context Builder → LLM → Message → Validation
+This phase begins from the Contact record, not from a disconnected message form.
 
-Support Email and LinkedIn drafts. LinkedIn character limit is user-provided.
+### Workflow
+Contact Record → Draft Outreach → Context Retrieval → LLM → Validation → User Review/Edit
+
+### Context retrieved automatically
+- Career profile
+- Networking preferences
+- Company information
+- Person/contact information
+- Relevant job information, if available
+- Writing preferences
+- Relevant previous outreach/interactions, if any
+
+### Channel behavior
+- LinkedIn: ask for character limit before generation and validate the result.
+- Email: no mandatory character limit.
+
+### Acceptance criteria
+- Draft Outreach is available from a contact.
+- The system retrieves the required context automatically.
+- User does not re-enter known company/person information.
+- Generated message is displayed immediately for review.
+- User can edit or regenerate.
+- LinkedIn character limit is respected.
+- Relevant previous outreach is included when available.
 
 ## Phase 5 — Human Approval
-Drafted → User Review → Edit/Regenerate → Approved → Execute
+Drafted → User Review/Edit → Approved → Execute
 
 External outreach requires explicit approval.
 
+The approval flow must preserve the connection to the Contact and Outreach record.
+
 ## Phase 6 — Outreach Tracking
 Record status, channel, date, response summary, outcome, notes and next action. Status remains user-driven in MVP.
+
+The resulting outreach record remains associated with the Contact.
 
 ## Phase 7 — Daily Limits & Reminders
 - Enforce configurable daily outreach limit.
@@ -72,7 +119,17 @@ Record status, channel, date, response summary, outcome, notes and next action. 
 - Do not automatically send follow-ups.
 
 ## Phase 8 — AI Evaluation
-Capture AI output, user acceptance, user edits, rejection, human correction and final outcome. Establish baseline AI quality metrics.
+Capture:
+- AI recommendation
+- Recommendation acceptance/rejection
+- Contact fields automatically populated
+- User corrections
+- Message generation
+- Message edits/rejection
+- Human approval
+- Final outcome
+
+Establish baseline AI quality and workflow efficiency metrics.
 
 ## Claude Code Operating Model
 For every phase:
