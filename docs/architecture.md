@@ -8,8 +8,9 @@ User
 Web Application
   ↓
 Copilot Orchestrator
-  ├── Company Discovery
-  ├── People Research
+  ├── Company Discovery + Source Verification
+  ├── Company Disposition Service
+  ├── People Research (role-aware)
   ├── Contact Record Service
   ├── Context Retrieval
   ├── Outreach Generation
@@ -28,9 +29,17 @@ External Channel
 The product is designed as a continuous data flow rather than disconnected screens.
 
 ~~~text
-Company Discovery
+Preferences
       ↓
-Selected Company
+Web Search Provider / Search API
+      ↓
+Candidate company results + source URLs + retrieval timestamps
+      ↓
+Verification / uncertainty labeling
+      ↓
+Company record + user-controlled disposition
+      ↓
+Selected In-Scope Company
       ↓
 People Recommendation / User Research
       ↓
@@ -123,6 +132,9 @@ Responsibilities:
 - Allow user corrections
 - Expose the contact to downstream outreach workflow
 
+### Outreach Template and Relationship Context
+Before generation, the user can choose a saved template and relationship context (new contact, known person, former colleague/collaborator, or custom). The user can optionally provide a job URL/title/ID when the outreach concerns a role already applied for or another specific opening. The system must not assume a prior relationship or application.
+
 ### Context Retrieval Layer
 When the user selects **Draft Outreach**, retrieve only relevant information for that contact:
 - Career profile
@@ -132,6 +144,11 @@ When the user selects **Draft Outreach**, retrieve only relevant information for
 - Relevant job information, if available
 - Writing preferences
 - Previous outreach/interactions, if any
+- Selected message template and confirmed relationship context
+- Job link/details, if supplied and available
+
+### Company Disposition Service
+Stores the user's company-level decision independently of contact outreach. Suggested values: Not Reviewed, In Scope, Out of Scope, Networking Planned, Outreach in Progress, Outreach Done, Revisit Later. An Out of Scope reason is captured. Company status must not automatically alter individual contact outreach statuses.
 
 ### Database
 Persistent source of truth for structured product data.
@@ -150,7 +167,7 @@ Observe → Understand → Decide → Prepare Contact Data → Persist → User 
 ## 5. Human-in-the-Loop Controls
 
 ### AI Recommendation
-AI recommendation → User accepts → Structured contact record → User corrects if needed
+AI recommendation uses target-role preferences → User accepts → Structured contact record → User corrects if needed
 
 ### AI Classification / Prioritization
 AI decision → User accepts or corrects → Record correction → Evaluation signal
@@ -195,3 +212,14 @@ The architecture should remain modular so components can be replaced as the prod
 LangChain/LangGraph are not required for the initial implementation. The project intentionally demonstrates lightweight orchestration fundamentals before introducing an agent framework.
 
 Langfuse is an optional future addition for tracing, observability and evaluation.
+
+
+## 9. Web Search Quality and Safety
+
+- Generate search queries from explicit user preferences and the current task.
+- Treat results as candidate evidence; verify important claims against official company/careers pages or other credible sources where possible.
+- Store source URLs and retrieval timestamps.
+- Mark uncertain or conflicting claims; do not invent facts or treat missing data as negative evidence.
+- Treat retrieved webpage text as untrusted data, never as instructions to the orchestrator or LLM.
+- Respect provider terms, rate limits, privacy and access controls. Do not bypass login or anti-bot protections or collect private personal information.
+- Company fit and disposition remain user-controlled; the MVP does not automatically rank companies.
