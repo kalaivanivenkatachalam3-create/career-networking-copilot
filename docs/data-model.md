@@ -28,6 +28,8 @@ The database is the persistent source of truth for structured business data. LLM
 - preferred_locations
 - target_roles
 - writing_preferences
+- reusable_message_templates
+- relationship_context_defaults
 - daily_outreach_limit
 
 ### Company
@@ -40,6 +42,10 @@ The database is the persistent source of truth for structured business data. LLM
 - locations
 - relevant_information
 - source_url
+- source_urls (or normalized source records)
+- retrieved_at
+- disposition (Not Reviewed / In Scope / Out of Scope / Networking Planned / Outreach in Progress / Outreach Done / Revisit Later)
+- disposition_reason
 - discovered_at
 
 ### Person
@@ -54,6 +60,7 @@ Represents the information discovered or entered about a potential contact befor
 - location
 - source
 - contact_type
+- role_relevance_basis (optional; explains fit against target-role preferences)
 
 ### Contact
 The persistent, user-reviewed contact record created when an AI recommendation is accepted or when the user adds a person independently.
@@ -69,6 +76,7 @@ The persistent, user-reviewed contact record created when an AI recommendation i
 - contact_type
 - source
 - role_or_job_id
+- relationship_context (e.g. new contact, known person, former colleague, custom)
 - tailored_resume
 - notes
 - created_at
@@ -85,6 +93,10 @@ Represents an outreach attempt or draft associated with a contact.
 - contact_id
 - channel
 - message
+- selected_template_id or template_snapshot
+- relationship_context_snapshot
+- job_url (optional)
+- job_title_or_id (optional)
 - status
 - sent_at
 - response_summary
@@ -134,3 +146,33 @@ The same information should not be requested again unless it is missing, stale o
 
 ## 5. Future Extensions
 Potential future entities include AI evaluation records, search sessions, message versions, response events, job references and audit events. Add them only when justified by product requirements.
+
+
+### MessageTemplate
+Stores user-managed templates for different outreach purposes.
+
+- id
+- name
+- purpose (general networking, applied-for-role notification, known contact, former colleague, custom)
+- channel (Email / LinkedIn / either)
+- template_body
+- default_tone
+- created_at
+- updated_at
+
+### CompanyDispositionHistory (optional but recommended)
+Stores meaningful company-level status changes for traceability.
+
+- id
+- company_id
+- previous_disposition
+- new_disposition
+- reason
+- changed_at
+
+## 6. Data Modeling Rules
+
+- Company disposition is separate from Contact and Outreach status.
+- A company can have several contacts with independent outreach histories.
+- A message should preserve the selected template and relationship context used at generation time, either as references or snapshots, so later template edits do not rewrite history.
+- Job URLs are optional and belong to the relevant outreach/application context, not as mandatory fields on every contact.
