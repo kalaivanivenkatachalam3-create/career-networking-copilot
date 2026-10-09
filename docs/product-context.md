@@ -32,9 +32,12 @@ Preferences → Discover Companies → Review → Identify/Add People → Contac
 - Present the discovered company list.
 - Do not automatically rank companies in the MVP.
 - Open jobs are informative, not required for networking.
+- Use web search as discovery evidence, preserve source URLs/retrieval dates, prefer credible/official sources, and label uncertain facts rather than inventing them.
+- Track company disposition separately from individual outreach status: Not Reviewed, In Scope, Out of Scope, Networking Planned, Outreach in Progress, Outreach Done, Revisit Later.
+- When marked Out of Scope, capture a reason such as capability/domain, role/experience, location, or other mismatch.
 
 ### People
-- AI may recommend HR, Talent Acquisition, relevant Product leaders, or people in closely related roles.
+- AI may recommend HR/Talent Acquisition and role-relevant contacts based on the user's target roles: e.g. Product leaders for Product roles, Engineering leaders/directors for Engineering roles, and Project/Program Managers for project/program roles.
 - Location relevance is a recommendation signal, not a hard filter.
 - The user can accept an AI recommendation or add a person found independently.
 - When an AI recommendation is accepted, available information is automatically carried into the contact record.
@@ -51,6 +54,9 @@ User adds person → Contact record → Draft Outreach → AI-generated message 
 
 ### Outreach
 - Support Email and LinkedIn.
+- User can configure reusable message templates and choose a template per outreach.
+- Drafting adapts to relationship context (new contact, known person, former colleague/collaborator, or user-defined context); prior relationship is never assumed.
+- User may attach a job link/title/ID when they have applied or want to discuss a specific role.
 - AI drafts personalized messages from the selected contact record and retrieved context.
 - LinkedIn character limits are supplied by the user before drafting.
 - No automatic LinkedIn sending in MVP.
