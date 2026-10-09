@@ -33,23 +33,28 @@ Completion criteria:
 - Daily outreach limit validates correctly.
 - Tests pass.
 
-## Phase 2 — Company Discovery
-Preferences → Discovery → Web Search → Relevance Validation → Store → Display
+## Phase 2 — Company Discovery & Disposition
+Preferences → Query planning → Web Search → Source verification / uncertainty labeling → Store → User review → Company disposition
 
 Capabilities:
-- Search companies using preferences
-- Validate preferred-location presence
-- Capture sources
-- Store discovered companies
-- Present company list
+- Build web-search queries from saved industry, domain, company type and location preferences.
+- Treat results as candidate evidence and verify important claims against official company/careers pages or other credible sources where possible.
+- Capture source URLs and retrieval timestamps; mark uncertain/missing information rather than inventing facts.
+- Validate preferred-location presence.
+- Store and present discovered companies.
+- Allow company disposition: Not Reviewed, In Scope, Out of Scope, Networking Planned, Outreach in Progress, Outreach Done, Revisit Later.
+- Capture an Out of Scope reason such as capability/domain mismatch, role/experience mismatch, location or other.
+- Keep company disposition separate from individual contact/outreach status.
 
-No automatic company ranking in MVP.
+No automatic company ranking in MVP. Do not bypass login, anti-bot controls or source access restrictions.
 
 ## Phase 3 — People / Contacts
 This phase explicitly implements the continuous People → Contact workflow.
 
 ### AI recommendation path
 Company → AI recommends person → User accepts → Contact record automatically created/pre-populated → User reviews/edits
+
+Contact recommendations must be role-aware based on saved target roles: for example, Product leaders for Product roles, Engineering leaders for Engineering roles, and Project/Program Managers for project/program roles. HR/Talent Acquisition can be recommended across role types.
 
 Known fields should be carried forward automatically:
 - Full name
@@ -73,10 +78,16 @@ Company → User adds person → Contact record created → User reviews/edits
 - The contact record exposes **Draft Outreach**.
 
 ## Phase 4 — Outreach Generation
-This phase begins from the Contact record, not from a disconnected message form.
+This phase begins from the Contact record, not from a disconnected message form. It supports saved user templates, relationship context, and an optional job link for role-specific outreach.
 
 ### Workflow
 Contact Record → Draft Outreach → Context Retrieval → LLM → Validation → User Review/Edit
+
+### Before generation
+- Let the user select a saved message template or default template.
+- Ask for relationship context: new contact, known person, former colleague/collaborator, or custom.
+- Allow optional job URL and job title/ID when the user has applied or wants to discuss a specific role.
+- Never assume a prior relationship or application unless the user confirms it.
 
 ### Context retrieved automatically
 - Career profile
@@ -86,6 +97,8 @@ Contact Record → Draft Outreach → Context Retrieval → LLM → Validation �
 - Relevant job information, if available
 - Writing preferences
 - Relevant previous outreach/interactions, if any
+- Selected template and relationship context
+- Job link/details, if supplied and available
 
 ### Channel behavior
 - LinkedIn: ask for character limit before generation and validate the result.
@@ -99,6 +112,9 @@ Contact Record → Draft Outreach → Context Retrieval → LLM → Validation �
 - User can edit or regenerate.
 - LinkedIn character limit is respected.
 - Relevant previous outreach is included when available.
+- Draft uses the selected template and adapts to confirmed relationship context.
+- Optional job link/details are used when supplied.
+- Template/relationship context and job details are associated with the resulting outreach record.
 
 ## Phase 5 — Human Approval
 Drafted → User Review/Edit → Approved → Execute
