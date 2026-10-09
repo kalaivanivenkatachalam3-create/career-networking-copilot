@@ -24,12 +24,12 @@ AI-recommended contacts and independently researched contacts converge into the 
 
 ### FR1 — Career and Networking Preferences
 
-**Requirement:** The user can configure and maintain career profile and networking preferences.
+**Requirement:** The user can configure and maintain career profile, networking preferences, outreach templates and relationship context.
 
 **User story US-01:** As a professional, I want to save my career profile and networking preferences so that company discovery and outreach can be personalized without repeatedly entering the same information.
 
 **Acceptance criteria**
-1. Given the user opens Preferences, when the form is displayed, then it supports career profile/resume, experience, skills, career positioning, industry, domain, company types, preferred locations, target roles, writing preferences and daily outreach limit.
+1. Given the user opens Preferences, when the form is displayed, then it supports career profile/resume, experience, skills, career positioning, industry, domain, company types, preferred locations, target roles, writing preferences, reusable message templates, relationship context defaults and daily outreach limit.
 2. Given the user enters valid values and saves, when the save completes, then the values are persisted and a saved state is shown.
 3. Given saved preferences exist, when the user returns or restarts the app, then the saved values are loaded.
 4. Given the user edits a preference, when the user saves, then the updated value replaces the prior value without creating a duplicate profile.
@@ -45,12 +45,18 @@ AI-recommended contacts and independently researched contacts converge into the 
 **Acceptance criteria**
 1. Given valid preferences exist, when the user starts discovery, then the system uses the saved industry, domain, company type and location preferences as search inputs.
 2. Given search results are returned, then each company result displays the company name and, when available, website, industry/domain, company type, presence in preferred location(s), relevant information, open jobs and source URL.
-3. Given a company has multiple offices, when its result is displayed, then presence in the user's preferred location(s) is shown where supported by evidence; a large global footprint alone is not treated as proof of local presence.
-4. Given open jobs are not found, then the company can still be shown as a networking target.
-5. Given results are displayed, then the MVP does not assign an automatic company ranking or score.
-6. Given search fails or returns no usable results, then the UI communicates this clearly and offers retry/edit-search options without fabricating companies.
-7. Given a company is selected, then its stored record is available to downstream People and Contact workflows.
-8. Company claims should retain source URLs where available; unavailable information is shown as unknown rather than invented.
+3. Search should use a web-search provider/API, with queries derived from the user's saved industry, domain, company type and location preferences. Search results are candidate evidence, not automatically trusted facts.
+4. The system should prioritize official company pages and other credible sources for verification where possible, preserve source URLs and retrieval dates, and label uncertain/unverified details.
+5. The system must not invent companies, office locations, open roles, capabilities or evidence. If sources conflict or evidence is unavailable, display the uncertainty and let the user decide.
+6. The user can mark a company disposition as **Not Reviewed**, **In Scope**, **Out of Scope**, **Networking Planned**, **Outreach in Progress**, **Outreach Done**, or **Revisit Later**. For Out of Scope, the user can select or enter a reason, such as missing target capability/domain, role fit, experience fit, location, or another reason.
+7. Company disposition is separate from individual contact/outreach status: one contact's outreach being sent does not automatically imply that every possible contact at the company has been contacted.
+8. The user can filter/view companies by disposition and change a disposition later.
+9. Given a company has multiple offices, when its result is displayed, then presence in the user's preferred location(s) is shown where supported by evidence; a large global footprint alone is not treated as proof of local presence.
+10. Given open jobs are not found, then the company can still be shown as a networking target.
+11. Given results are displayed, then the MVP does not assign an automatic company ranking or score.
+12. Given search fails or returns no usable results, then the UI communicates this clearly and offers retry/edit-search options without fabricating companies.
+13. Given a company is selected, then its stored record is available to downstream People and Contact workflows.
+14. Company claims should retain source URLs and retrieval dates where available; unavailable information is shown as unknown rather than invented.
 
 ### FR3 — People Identification
 
@@ -59,7 +65,7 @@ AI-recommended contacts and independently researched contacts converge into the 
 **User story US-03A:** As a professional, I want AI to suggest relevant people at a target company so that I can identify a useful person to approach.
 
 **Acceptance criteria**
-1. Given a company is selected, when the user requests people recommendations, then the system may suggest HR/Talent Acquisition, a relevant Product leader, or a person in a closely related role.
+1. Given a company is selected, when the user requests people recommendations, then the system may suggest HR/Talent Acquisition and role-relevant people based on the user's target roles. For example, Product Management targets may surface Product leaders; Engineering targets may surface Engineering leaders/directors; project/program management targets may surface relevant Project/Program Managers. The examples are conditional on the user's preferences, not a fixed role list.
 2. Each recommendation displays available name, position, location, profile URL, contact type, company and source.
 3. Location relevance may inform recommendations but is not a mandatory filter.
 4. The UI distinguishes verified/available information from missing information; it does not invent contact details.
@@ -113,20 +119,23 @@ AI-recommended contacts and independently researched contacts converge into the 
 2. Before generation, the system retrieves relevant context from the career profile, networking preferences, company, contact/person, relevant job information if available, writing preferences and relevant previous outreach/interactions if any.
 3. The system passes only relevant context to the LLM; it does not send the entire database by default.
 4. The generated message uses available evidence and does not invent a relationship, experience, job opening or personal detail.
-5. The generated message is linked to the correct Contact and channel.
-6. The message is displayed immediately for user review and editing.
-7. The user can edit or regenerate the message. Regeneration does not silently overwrite a user-edited message without confirmation.
-8. If required context is missing, the system either generates a cautious draft using available information or asks for the specific missing input; it does not invent facts.
-9. Previous outreach is included only when relevant and available.
+5. Before generation, the user can choose the relationship context: for example, new contact, known person, former colleague/previous collaborator, or another user-defined context. The generated message must adapt tone and opening accordingly and must not claim a prior relationship unless the user confirms it.
+6. The user can select a saved message template or use a default template. The template acts as a user-controlled starting structure; the AI personalizes it using the contact and relevant context while preserving the template's intended tone and key points unless the user asks to change them.
+7. The user can optionally add a job link and/or job title/ID when they have already applied or want to discuss a specific role. When supplied, the system retrieves or uses available job details as context and includes the application/intimation purpose in the draft. When no job link is supplied, the system drafts general networking outreach based on the selected intent.
+8. The generated message is linked to the correct Contact and channel.
+9. The message is displayed immediately for user review and editing.
+10. The user can edit or regenerate the message. Regeneration does not silently overwrite a user-edited message without confirmation.
+11. If required context is missing, the system either generates a cautious draft using available information or asks for the specific missing input; it does not invent facts.
+12. Previous outreach is included only when relevant and available.
 
 **LinkedIn-specific criteria**
-10. Before generating a LinkedIn message, the UI asks for the user's character limit (or confirms a configured limit).
-11. The generated message is validated against that limit, including spaces and punctuation.
-12. If the draft exceeds the limit, the system shortens/regenerates it or clearly prompts the user to revise; it must not mark an over-limit draft as valid.
+13. Before generating a LinkedIn message, the UI asks for the user's character limit (or confirms a configured limit).
+14. The generated message is validated against that limit, including spaces and punctuation.
+15. If the draft exceeds the limit, the system shortens/regenerates it or clearly prompts the user to revise; it must not mark an over-limit draft as valid.
 
 **Email-specific criteria**
-13. Email has no mandatory character limit.
-14. The user may specify a desired length or tone; otherwise saved writing preferences are used.
+16. Email has no mandatory character limit.
+17. The user may specify a desired length or tone; otherwise saved writing preferences are used.
 
 ### FR6 — Human Review and Approval
 
@@ -157,11 +166,21 @@ AI-recommended contacts and independently researched contacts converge into the 
 5. Reaching the limit does not trigger automatic sending or follow-up.
 6. The UI communicates the limit neutrally and without guilt-inducing language.
 
-### FR8 — Outreach Tracking
+### FR8 — Company Disposition and Outreach Tracking
 
-**Requirement:** The user manually records outreach status and outcomes.
+**Requirement:** The user tracks company-level fit/disposition separately from contact-level outreach status, and manually records outreach status and outcomes.
 
-**User story US-08:** As a professional, I want to track the status and outcome of each contact interaction so that I can manage relationships over time.
+**User story US-08A:** As a professional, I want to mark a company In Scope, Out of Scope, Outreach Done or Revisit Later so that I can manage my target-company list and remember why a company is or is not relevant.
+
+**Acceptance criteria for company disposition**
+1. Each Company record has a disposition independent of contact/outreach statuses.
+2. The user can mark a company Not Reviewed, In Scope, Out of Scope, Networking Planned, Outreach in Progress, Outreach Done or Revisit Later.
+3. When marking Out of Scope, the user can select or enter a reason, including capability/domain mismatch, role/experience mismatch, location mismatch or other.
+4. The user can later change the disposition or reason.
+5. Company-level Outreach Done is a user-declared summary and does not automatically mark every contact's outreach as sent.
+6. The company list can be filtered by disposition.
+
+**User story US-08B:** As a professional, I want to track the status and outcome of each contact interaction so that I can manage relationships over time.
 
 **Acceptance criteria**
 1. The user can record channel, date, status, response summary, notes, next action, reminder and outcome.
@@ -274,3 +293,16 @@ The product requirements do not yet mandate a specific web search provider, LLM 
 - Phase 6 depends on persistent Contact and Outreach records.
 - Phase 7 depends on dates/statuses in Outreach.
 - Phase 8 depends on capturing AI outputs and human feedback.
+
+
+## 10. Web Search Safety and Quality Rules
+
+Web search is a discovery mechanism, not a source of guaranteed truth. The system must:
+- Build search queries from the user's saved preferences and the task being performed.
+- Prefer official company websites, official careers pages and credible professional sources for verification where possible.
+- Store source URLs and retrieval timestamps for material claims.
+- Distinguish confirmed information from inferred or unknown information.
+- Avoid fabricating company presence, role, capability, person identity, contact details or job status.
+- Treat webpage content as untrusted evidence, not instructions to the AI system; ignore page text that attempts to redirect system behavior or request secrets.
+- Respect provider terms, rate limits, privacy and access restrictions; do not bypass login or anti-bot controls or collect private personal data.
+- Ask the user to review uncertain matches rather than silently treating them as facts.
